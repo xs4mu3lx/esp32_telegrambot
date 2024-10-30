@@ -211,7 +211,7 @@ void http_task(void *pvParameters)
     ESP_LOGW(TAG_HTTP_CLIENT_HANDLER, "Wait 2 second before start");
     vTaskDelay(pdMS_TO_TICKS(2000));
 
-    http_get_post(chat_ID, msg_reset, 1);
+    http_get_post(CHAT_ID, msg_reset, 1);
 
 
     while (1)
