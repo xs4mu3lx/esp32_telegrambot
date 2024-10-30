@@ -55,7 +55,7 @@
 
 /*Telegram configuration*/
 #define TOKEN "your token bot"
-#define chat_ID "your chat-id"
+#define CHAT_ID "your chat-id"
 
 #define TAG_HTTP_TASK            "[ http_task ]"
 #define TAG_HTTP_CLIENT_HANDLER  "[ http client Handler ]"
