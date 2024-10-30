@@ -35,9 +35,9 @@ extern const char telegram_certificate_pem_end[] asm("_binary_telegram_certifica
 
 void http_get_post(char *chat_id, char *str_send, uint8_t metodo)
 {
-    char url[512] = "https://api.telegram.org/bot";
+    char url[1024] = "https://api.telegram.org/bot";
     char output_buffer[MAX_HTTP_OUTPUT_BUFFER] = {0};
-
+    char post_data[1024] = "";
 
     esp_http_client_config_t config = {
         .url = "https://api.telegram.org",
@@ -53,17 +53,12 @@ void http_get_post(char *chat_id, char *str_send, uint8_t metodo)
     if (metodo == 1)
     {
         /* POST */
-        strcat(url, TOKEN);
-        strcat(url, "/sendMessage");
-
-        esp_http_client_set_url(client, url);
-
-        char post_data[512] = "";
-
+        snprintf(url, sizeof(url), "https://api.telegram.org/bot%s/sendMessage", TOKEN);
         sprintf(post_data, "{\"chat_id\":%s,\"text\":\"%s\"}", chat_id, str_send);
 
         ESP_LOGW(TAG_SEND_MSS, "Json: %s", post_data);
 
+        esp_http_client_set_url(client, url);
         esp_http_client_set_method(client, HTTP_METHOD_POST);
         esp_http_client_set_header(client, "Content-Type", "application/json");
         esp_http_client_set_post_field(client, post_data, strlen(post_data));
@@ -72,10 +67,8 @@ void http_get_post(char *chat_id, char *str_send, uint8_t metodo)
 
         if (err == ESP_OK)
         {
-            ESP_LOGI(TAG_SEND_MSS, "HTTP POST Status = %d, content_length = %" PRId64,
-                     esp_http_client_get_status_code(client),
-                     esp_http_client_get_content_length(client));
-            ESP_LOGW(TAG_SEND_MSS, "Perform output: %s", output_buffer);
+            ESP_LOGI(TAG_SEND_MSS, "HTTP POST Status = %d, content_length = %" PRId64, esp_http_client_get_status_code(client), esp_http_client_get_content_length(client));
+            printf("Perform output: %s\n", output_buffer);
         }
 
         else
@@ -90,17 +83,14 @@ void http_get_post(char *chat_id, char *str_send, uint8_t metodo)
         snprintf(url, sizeof(url), "https://api.telegram.org/bot%s/getUpdates?offset=%d&limit=1", TOKEN, data_update_t.last_update_id + 1);
 
         esp_http_client_set_url(client, url);
-
         esp_http_client_set_method(client, HTTP_METHOD_GET);
 
         esp_err_t err = esp_http_client_perform(client);
 
         if (err == ESP_OK)
     {
-        ESP_LOGI(TAG_GET_UPDATE, "HTTPS Status = %d, content_length = %lld",
-                 esp_http_client_get_status_code(client),
-                 esp_http_client_get_content_length(client));
-        ESP_LOGW(TAG_GET_UPDATE, "Perform output: %s", output_buffer);
+        ESP_LOGI(TAG_GET_UPDATE, "HTTPS Status = %d, content_length = %lld", esp_http_client_get_status_code(client), esp_http_client_get_content_length(client));
+        printf("Perform output: %s\n", output_buffer);
 
         char *text_pos = strstr(output_buffer, "\"text\"");
 
